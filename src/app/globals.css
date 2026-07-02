@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+:root {
+  --background: #000000;
+  --foreground: #ffffff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --color-base-black: #000000;
+  --color-base-950: #0a0a0a;
+  --color-base-900: #111111;
+  --color-base-800: #1a1a1a;
+  --color-base-700: #2a2a2a;
+  --color-base-500: #666666;
+  --color-base-300: #a3a3a3;
+  --color-base-100: #e5e5e5;
+  --color-base-white: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  background: #000000;
+  color: #ffffff;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+/* Plain CSS marquee animation — Tailwind v4 doesn't read JS keyframes */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
