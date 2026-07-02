@@ -6,8 +6,7 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function ContactForm() {
   const [form, setForm] = useState({ name: "", email: "", message: "", botcheck: "" });
-  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
-  const [pending, setPending] = useState(false);
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
   const [errors, setErrors] = useState<{ name?: string; email?: string; message?: string }>({});
 
@@ -63,24 +62,28 @@ export function ContactForm() {
     }
 
     setErrors({});
-    setPending(true);
 
     if (form.botcheck.trim()) {
       setStatus("success");
-      setPending(false);
       setCooldownSeconds(30);
       return;
     }
 
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: form.name.trim(), email: form.email.trim(), message: form.message.trim() }),
-      });
+    setStatus("loading");
 
-      if (response.ok) {
+    const formData = new FormData(event.currentTarget);
+    formData.append("access_key", "WEB3FORMS_ACCESS_KEY_PLACEHOLDER");
+
+    try {
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await res.json();
+
+      if (result.success) {
         setStatus("success");
+        event.currentTarget.reset();
         setForm({ name: "", email: "", message: "", botcheck: "" });
         setCooldownSeconds(30);
       } else {
@@ -88,12 +91,10 @@ export function ContactForm() {
       }
     } catch {
       setStatus("error");
-    } finally {
-      setPending(false);
     }
   }
 
-  const submitDisabled = pending || cooldownSeconds > 0;
+  const submitDisabled = status === "loading" || cooldownSeconds > 0;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 border border-base-800 bg-base-950 p-5">
@@ -111,6 +112,7 @@ export function ContactForm() {
         <label className="space-y-2 text-sm text-base-300">
           <span className="font-mono text-[10px] uppercase tracking-[0.24em]">name</span>
           <input
+            name="name"
             value={form.name}
             onChange={(event) => setForm({ ...form, name: event.target.value })}
             className="w-full border border-base-800 bg-black px-3 py-2 text-white outline-none"
@@ -121,6 +123,7 @@ export function ContactForm() {
           <span className="font-mono text-[10px] uppercase tracking-[0.24em]">email</span>
           <input
             type="email"
+            name="email"
             value={form.email}
             onChange={(event) => setForm({ ...form, email: event.target.value })}
             className="w-full border border-base-800 bg-black px-3 py-2 text-white outline-none"
@@ -131,6 +134,7 @@ export function ContactForm() {
       <label className="block space-y-2 text-sm text-base-300">
         <span className="font-mono text-[10px] uppercase tracking-[0.24em]">message</span>
         <textarea
+          name="message"
           value={form.message}
           onChange={(event) => setForm({ ...form, message: event.target.value })}
           className="min-h-32 w-full border border-base-800 bg-black px-3 py-2 text-white outline-none"
@@ -143,7 +147,7 @@ export function ContactForm() {
           disabled={submitDisabled}
           className="inline-flex items-center justify-center border border-base-800 bg-base-900 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.24em] text-white transition hover:border-white hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {pending ? "sending..." : submitDisabled ? "wait..." : "submit()"}
+          {status === "loading" ? "sending..." : submitDisabled ? "wait..." : "submit()"}
         </button>
         <div className="space-y-1 text-sm text-base-300">
           {status === "success" && (
@@ -152,9 +156,7 @@ export function ContactForm() {
             </p>
           )}
           {status === "error" && <p>Please try again in a moment.</p>}
-          {cooldownSeconds > 0 && status !== "success" && (
-            <p>You can send another message in {cooldownSeconds}s.</p>
-          )}
+          {cooldownSeconds > 0 && status !== "success" && <p>You can send another message in {cooldownSeconds}s.</p>}
         </div>
       </div>
     </form>
