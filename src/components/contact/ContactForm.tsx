@@ -4,7 +4,7 @@ import { useState } from "react";
 import { contactSchema, type ContactFormData } from "@/src/lib/validators";
 
 const API_URL = "https://api.web3forms.com/submit";
-const ACCESS_KEY = "your_web3forms_access_key"; // replace with your actual Web3Forms access key
+const ACCESS_KEY = "7c206efe-2696-4afe-a3b8-361e48442c67";
 
 export function ContactForm() {
   const [formData, setFormData] = useState<ContactFormData>({
