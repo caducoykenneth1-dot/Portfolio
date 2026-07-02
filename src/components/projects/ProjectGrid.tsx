@@ -1,8 +1,8 @@
 import { ProjectCard } from "@/src/components/projects/ProjectCard";
-import type { ProjectRecord } from "@/src/server/models/Project";
+import type { Project } from "@/src/lib/projects";
 
 interface ProjectGridProps {
-  projects: ProjectRecord[];
+  projects: Project[];
 }
 
 export function ProjectGrid({ projects }: ProjectGridProps) {

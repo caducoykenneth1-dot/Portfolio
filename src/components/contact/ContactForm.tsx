@@ -1,164 +1,143 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { contactSchema, type ContactFormData } from "@/src/lib/validators";
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const API_URL = "https://api.web3forms.com/submit";
+const ACCESS_KEY = "your_web3forms_access_key"; // replace with your actual Web3Forms access key
 
 export function ContactForm() {
-  const [form, setForm] = useState({ name: "", email: "", message: "", botcheck: "" });
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [cooldownSeconds, setCooldownSeconds] = useState(0);
-  const [errors, setErrors] = useState<{ name?: string; email?: string; message?: string }>({});
+  const [formData, setFormData] = useState<ContactFormData>({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [honeypot, setHoneypot] = useState("");
+  const [errors, setErrors] = useState<Partial<Record<keyof ContactFormData, string>>>({});
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [feedback, setFeedback] = useState("");
+  const [cooldown, setCooldown] = useState(0);
 
-  useEffect(() => {
-    if (cooldownSeconds <= 0) {
-      return;
-    }
+  const handleChange = (field: keyof ContactFormData) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData((prev) => ({ ...prev, [field]: event.target.value }));
+    setErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
 
-    const timer = window.setTimeout(() => {
-      setCooldownSeconds((current) => Math.max(0, current - 1));
-    }, 1000);
-
-    return () => window.clearTimeout(timer);
-  }, [cooldownSeconds]);
-
-  function validateForm() {
-    const nextErrors: { name?: string; email?: string; message?: string } = {};
-
-    if (!form.name.trim()) {
-      nextErrors.name = "Name is required.";
-    }
-
-    if (!form.email.trim()) {
-      nextErrors.email = "Email is required.";
-    } else if (!emailPattern.test(form.email.trim())) {
-      nextErrors.email = "Enter a valid email address.";
-    }
-
-    const messageLength = form.message.trim().length;
-    if (!messageLength) {
-      nextErrors.message = "Message is required.";
-    } else if (messageLength < 10) {
-      nextErrors.message = "Message must be at least 10 characters.";
-    } else if (messageLength > 2000) {
-      nextErrors.message = "Message cannot exceed 2000 characters.";
-    }
-
-    return nextErrors;
-  }
-
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setStatus("idle");
 
-    if (cooldownSeconds > 0) {
+    if (honeypot.trim().length > 0) {
       return;
     }
 
-    const validationErrors = validateForm();
-    if (Object.keys(validationErrors).length) {
-      setErrors(validationErrors);
+    const result = contactSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: Partial<Record<keyof ContactFormData, string>> = {};
+      result.error.issues.forEach((issue) => {
+        const key = issue.path[0] as keyof ContactFormData;
+        fieldErrors[key] = issue.message;
+      });
+      setErrors(fieldErrors);
+      setFeedback("Please fix the highlighted fields.");
+      setStatus("error");
       return;
     }
 
-    setErrors({});
-
-    if (form.botcheck.trim()) {
-      setStatus("success");
-      setCooldownSeconds(30);
-      return;
-    }
-
-    setStatus("loading");
-
-    const formData = new FormData(event.currentTarget);
-    formData.append("access_key", "WEB3FORMS_ACCESS_KEY_PLACEHOLDER");
+    setStatus("sending");
+    setFeedback("");
 
     try {
-      const res = await fetch("https://api.web3forms.com/submit", {
+      const form = new FormData();
+      form.append("access_key", ACCESS_KEY);
+      form.append("subject", "New portfolio message");
+      form.append("name", formData.name);
+      form.append("email", formData.email);
+      form.append("message", formData.message);
+      form.append("botcheck", honeypot);
+
+      const response = await fetch(API_URL, {
         method: "POST",
-        body: formData,
+        body: form,
       });
-      const result = await res.json();
 
-      if (result.success) {
-        setStatus("success");
-        event.currentTarget.reset();
-        setForm({ name: "", email: "", message: "", botcheck: "" });
-        setCooldownSeconds(30);
-      } else {
-        setStatus("error");
+      if (!response.ok) {
+        throw new Error("Form submission failed.");
       }
-    } catch {
-      setStatus("error");
-    }
-  }
 
-  const submitDisabled = status === "loading" || cooldownSeconds > 0;
+      setStatus("success");
+      setFeedback("Thanks for your message — I’ll get back to you soon.");
+      setFormData({ name: "", email: "", message: "" });
+      setCooldown(30);
+
+      const interval = window.setInterval(() => {
+        setCooldown((value) => {
+          if (value <= 1) {
+            window.clearInterval(interval);
+            return 0;
+          }
+          return value - 1;
+        });
+      }, 1000);
+    } catch (error) {
+      setStatus("error");
+      setFeedback("Something went wrong while sending your message. Please try again later.");
+    }
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 border border-base-800 bg-base-950 p-5">
-      <input
-        type="text"
-        name="botcheck"
-        value={form.botcheck}
-        onChange={(event) => setForm({ ...form, botcheck: event.target.value })}
-        className="hidden"
-        tabIndex={-1}
-        autoComplete="off"
-      />
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <label className="space-y-2 text-sm text-base-300">
-          <span className="font-mono text-[10px] uppercase tracking-[0.24em]">name</span>
+    <form onSubmit={handleSubmit} className="space-y-6 rounded-sm border border-base-800 bg-base-950/80 p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] sm:p-8">
+      <input type="text" name="botcheck" value={honeypot} onChange={(event) => setHoneypot(event.target.value)} className="hidden" autoComplete="off" tabIndex={-1} />
+      <div className="grid gap-6 sm:grid-cols-2">
+        <label className="grid gap-2 text-sm text-base-200">
+          <span className="font-medium text-base-100">Name</span>
           <input
-            name="name"
-            value={form.name}
-            onChange={(event) => setForm({ ...form, name: event.target.value })}
-            className="w-full border border-base-800 bg-black px-3 py-2 text-white outline-none"
+            type="text"
+            value={formData.name}
+            onChange={handleChange("name")}
+            className="rounded-none border border-base-700 bg-black px-3 py-3 text-sm text-white outline-none transition focus:border-white focus:ring-1 focus:ring-white/20"
+            placeholder="Your name"
           />
-          {errors.name && <p className="text-xs text-red-400">{errors.name}</p>}
+          {errors.name ? <span className="text-xs text-rose-400">{errors.name}</span> : null}
         </label>
-        <label className="space-y-2 text-sm text-base-300">
-          <span className="font-mono text-[10px] uppercase tracking-[0.24em]">email</span>
+
+        <label className="grid gap-2 text-sm text-base-200">
+          <span className="font-medium text-base-100">Email</span>
           <input
             type="email"
-            name="email"
-            value={form.email}
-            onChange={(event) => setForm({ ...form, email: event.target.value })}
-            className="w-full border border-base-800 bg-black px-3 py-2 text-white outline-none"
+            value={formData.email}
+            onChange={handleChange("email")}
+            className="rounded-none border border-base-700 bg-black px-3 py-3 text-sm text-white outline-none transition focus:border-white focus:ring-1 focus:ring-white/20"
+            placeholder="you@example.com"
           />
-          {errors.email && <p className="text-xs text-red-400">{errors.email}</p>}
+          {errors.email ? <span className="text-xs text-rose-400">{errors.email}</span> : null}
         </label>
       </div>
-      <label className="block space-y-2 text-sm text-base-300">
-        <span className="font-mono text-[10px] uppercase tracking-[0.24em]">message</span>
+
+      <label className="grid gap-2 text-sm text-base-200">
+        <span className="font-medium text-base-100">Message</span>
         <textarea
-          name="message"
-          value={form.message}
-          onChange={(event) => setForm({ ...form, message: event.target.value })}
-          className="min-h-32 w-full border border-base-800 bg-black px-3 py-2 text-white outline-none"
+          value={formData.message}
+          onChange={handleChange("message")}
+          rows={6}
+          className="rounded-none border border-base-700 bg-black px-3 py-3 text-sm text-white outline-none transition focus:border-white focus:ring-1 focus:ring-white/20"
+          placeholder="Tell me a bit about your project or what you want to build."
         />
-        {errors.message && <p className="text-xs text-red-400">{errors.message}</p>}
+        {errors.message ? <span className="text-xs text-rose-400">{errors.message}</span> : null}
       </label>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <button
-          type="submit"
-          disabled={submitDisabled}
-          className="inline-flex items-center justify-center border border-base-800 bg-base-900 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.24em] text-white transition hover:border-white hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {status === "loading" ? "sending..." : submitDisabled ? "wait..." : "submit()"}
-        </button>
-        <div className="space-y-1 text-sm text-base-300">
-          {status === "success" && (
-            <p>
-              Message sent. {cooldownSeconds > 0 ? `You can send another in ${cooldownSeconds}s.` : "Thank you."}
-            </p>
-          )}
-          {status === "error" && <p>Please try again in a moment.</p>}
-          {cooldownSeconds > 0 && status !== "success" && <p>You can send another message in {cooldownSeconds}s.</p>}
+
+      {feedback ? (
+        <div className={`rounded-sm border px-4 py-3 text-sm ${status === "success" ? "border-emerald-500 bg-emerald-500/10 text-emerald-100" : "border-rose-500 bg-rose-500/10 text-rose-100"}`}>
+          {feedback}
         </div>
-      </div>
+      ) : null}
+
+      <button
+        type="submit"
+        disabled={status === "sending" || cooldown > 0}
+        className="inline-flex min-h-[44px] items-center justify-center rounded-none border border-base-800 bg-white/5 px-6 py-3 text-sm uppercase tracking-[0.24em] text-white transition hover:border-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {cooldown > 0 ? `Send again in ${cooldown}s` : status === "sending" ? "Sending…" : "Send message"}
+      </button>
     </form>
   );
 }

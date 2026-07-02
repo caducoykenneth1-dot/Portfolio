@@ -31,6 +31,7 @@ export default function ContactPage() {
         </p>
         <div className="flex flex-col gap-2">
           {details.map((detail) => (
+            
             <a
               key={detail.label}
               href={detail.href}

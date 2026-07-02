@@ -1,9 +1,9 @@
 import Link from "next/link";
-import type { ProjectRecord } from "@/src/server/models/Project";
+import type { Project } from "@/src/lib/projects";
 import { ProjectCard } from "@/src/components/projects/ProjectCard";
 
 interface FeaturedProjectsProps {
-  projects: ProjectRecord[];
+  projects: Project[];
 }
 
 export function FeaturedProjects({ projects }: FeaturedProjectsProps) {

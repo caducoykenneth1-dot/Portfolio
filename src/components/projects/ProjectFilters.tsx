@@ -1,11 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { ProjectRecord } from "@/src/server/models/Project";
+import type { Project } from "@/src/lib/projects";
 import { ProjectGrid } from "@/src/components/projects/ProjectGrid";
 
 interface ProjectFiltersProps {
-  projects: ProjectRecord[];
+  projects: Project[];
 }
 
 export function ProjectFilters({ projects }: ProjectFiltersProps) {

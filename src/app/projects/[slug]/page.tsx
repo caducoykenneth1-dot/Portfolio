@@ -2,16 +2,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Badge } from "@/src/components/ui/Badge";
-import { ProjectService } from "@/src/server/services/ProjectService";
+import { projects } from "@/src/lib/projects";
 
 interface ProjectDetailPageProps {
   params: Promise<{ slug: string }>;
 }
 
+function findProject(slug: string) {
+  return projects.find((project) => project.slug === slug) ?? null;
+}
+
 export async function generateMetadata({ params }: ProjectDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const service = new ProjectService();
-  const project = await service.getProjectDetail(slug);
+  const project = findProject(slug);
 
   if (!project) {
     return { title: "Project not found" };
@@ -25,8 +28,7 @@ export async function generateMetadata({ params }: ProjectDetailPageProps): Prom
 
 export default async function ProjectDetailPage({ params }: ProjectDetailPageProps) {
   const { slug } = await params;
-  const service = new ProjectService();
-  const project = await service.getProjectDetail(slug);
+  const project = findProject(slug);
 
   if (!project) {
     notFound();

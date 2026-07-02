@@ -1,10 +1,14 @@
+"use client";
+
+"use client";
+
 import Link from "next/link";
 import { motion } from "framer-motion";
-import type { ProjectRecord } from "@/src/server/models/Project";
+import type { Project } from "@/src/lib/projects";
 import { Badge } from "@/src/components/ui/Badge";
 
 interface ProjectCardProps {
-  project: ProjectRecord;
+  project: Project;
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
