@@ -53,11 +53,11 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
               live_site →
             </a>
           ) : null}
-          {project.repoUrl ? (
-            <a href={project.repoUrl} target="_blank" rel="noreferrer" className="font-mono text-[11px] uppercase tracking-[0.24em] text-base-300 transition hover:text-white">
-              repository →
+        {project.githubUrl ? (
+            <a href={project.githubUrl} target="_blank" rel="noreferrer" className="font-mon...">
+                repository →
             </a>
-          ) : null}
+            ) : null}
         </div>
       </section>
     </main>
