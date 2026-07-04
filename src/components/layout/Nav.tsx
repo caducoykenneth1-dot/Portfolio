@@ -33,16 +33,21 @@ export function Nav() {
   return (
     <nav className={`sticky top-0 z-50 border-b border-base-800 transition-all duration-300 ${scrolled ? "bg-black py-2 backdrop-blur-sm" : "bg-black py-3"}`}>
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-      <Link href="/" className="flex items-center gap-2 font-sans text-base font-bold uppercase tracking-[0.15em] text-white">
-  <Image
-    src="/profile.jpg"
-    alt="Kenneth Caducoy"
-    width={40}
-    height={40}
-    className="h-10 w-10 rounded-full object-cover border border-base-800"
-  />
-  /Kenneth Caducoy
-</Link>
+        <Link href="/" className="flex items-center gap-3 text-white">
+          <Image
+            src="/profile.jpg"
+            alt="Kenneth Caducoy"
+            width={40}
+            height={40}
+            className="h-10 w-10 rounded-full border border-base-800 object-cover"
+          />
+          <span
+            style={{ fontFamily: "var(--font-pixel)" }}
+            className="text-xs tracking-tight text-white sm:text-sm"
+          >
+            KD_
+          </span>
+        </Link>
         <div className="hidden items-center gap-6 md:flex">
           {links.map((link) => {
             const isActive = pathname === link.href;
