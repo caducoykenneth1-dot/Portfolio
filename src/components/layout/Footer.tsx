@@ -24,7 +24,7 @@ export function Footer() {
     <footer className="border-t border-base-800 bg-black">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-6 text-sm text-base-300 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
         <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-base-500">
-          built with next.js + prisma
+          built with next.js + web3forms
         </p>
         <div className="flex items-center gap-3">
           {socials.map((social) => (

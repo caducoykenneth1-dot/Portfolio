@@ -6,6 +6,7 @@ export type Project = {
   liveUrl: string;
   githubUrl: string;
   featured: boolean;
+  image: string;
 };
 
 export const projects: Project[] = [
@@ -18,6 +19,7 @@ export const projects: Project[] = [
     liveUrl: "https://sibulan-market-pay-qyaf.vercel.app/",
     githubUrl: "https://github.com/caducoykenneth1-dot/sibulan-market-pay",
     featured: true,
+    image: "/projects/sibulan-market-pay.png",
   },
   {
     slug: "kapid-portal",
@@ -28,5 +30,6 @@ export const projects: Project[] = [
     liveUrl: "https://kapid-portal.vercel.app/",
     githubUrl: "https://github.com/caducoykenneth1-dot/kapid-portal",
     featured: true,
+    image: "/projects/kapid-portal.png",
   },
 ];
