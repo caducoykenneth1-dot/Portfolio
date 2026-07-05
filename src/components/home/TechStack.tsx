@@ -43,9 +43,9 @@ const techItems: TechItem[] = [
 
 function TechCard({ item }: { item: TechItem }) {
   return (
-    <div className="flex shrink-0 items-center gap-3">
-      <span className="text-sm text-base-400">{item.icon}</span>
-      <span className="whitespace-nowrap font-semibold text-base text-base-100">{item.name}</span>
+    <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+      <span className="text-xs sm:text-sm text-base-400">{item.icon}</span>
+      <span className="whitespace-nowrap font-semibold text-xs sm:text-sm md:text-base text-base-100">{item.name}</span>
     </div>
   );
 }
@@ -64,7 +64,7 @@ export function TechStack() {
 
       <div className="group relative left-1/2 right-1/2 -mx-[50vw] w-screen">
         <div className="relative left-1/2 right-1/2 -mx-[50vw] h-px w-screen bg-base-800" />
-        <div className="flex w-max animate-marquee items-center gap-8 py-6 group-hover:[animation-play-state:paused]">
+        <div className="flex w-max animate-marquee items-center gap-3 sm:gap-5 md:gap-8 py-3 sm:py-4 md:py-6 group-hover:[animation-play-state:paused]">
           {looped.map((item, i) => (
             <TechCard key={`${item.name}-${i}`} item={item} />
           ))}
