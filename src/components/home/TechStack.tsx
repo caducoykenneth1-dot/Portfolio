@@ -62,14 +62,14 @@ export function TechStack() {
         <h2 className="text-3xl font-semibold text-white md:text-4xl">Tech Stack</h2>
       </div>
 
-      <div className="group relative left-1/2 right-1/2 -mx-[50vw] w-screen">
-        <div className="relative left-1/2 right-1/2 -mx-[50vw] h-px w-screen bg-base-800" />
-        <div className="flex w-max animate-marquee items-center gap-3 sm:gap-5 md:gap-8 py-3 sm:py-4 md:py-6 group-hover:[animation-play-state:paused]">
+      <div className="group relative overflow-hidden px-4 sm:left-1/2 sm:right-1/2 sm:-mx-[50vw] sm:w-screen">
+        <div className="relative left-0 right-0 h-px w-full bg-base-800 sm:left-1/2 sm:right-1/2 sm:-mx-[50vw] sm:w-screen" />
+        <div className="flex w-max min-w-full animate-marquee items-center gap-3 sm:gap-5 md:gap-8 py-3 sm:py-4 md:py-6 group-hover:[animation-play-state:paused]">
           {looped.map((item, i) => (
             <TechCard key={`${item.name}-${i}`} item={item} />
           ))}
         </div>
-        <div className="relative left-1/2 right-1/2 -mx-[50vw] h-px w-screen bg-base-800" />
+        <div className="relative left-0 right-0 h-px w-full bg-base-800 sm:left-1/2 sm:right-1/2 sm:-mx-[50vw] sm:w-screen" />
       </div>
     </>
   );
