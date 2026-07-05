@@ -43,9 +43,9 @@ const techItems: TechItem[] = [
 
 function TechCard({ item }: { item: TechItem }) {
   return (
-    <div className="flex shrink-0 items-center gap-3 rounded-xl border border-base-800 bg-base-950/60 px-5 py-3 mx-2">
-      <span className="text-xl text-base-300">{item.icon}</span>
-      <span className="whitespace-nowrap font-mono text-sm text-base-200">{item.name}</span>
+    <div className="flex shrink-0 items-center gap-3">
+      <span className="text-sm text-base-400">{item.icon}</span>
+      <span className="whitespace-nowrap font-semibold text-base text-base-100">{item.name}</span>
     </div>
   );
 }
@@ -54,24 +54,21 @@ export function TechStack() {
   const looped = [...techItems, ...techItems];
 
   return (
-    <section className="relative overflow-hidden py-16">
-      <div className="mb-10 px-4 sm:px-6 lg:px-8">
+    <>
+      <div className="mb-10">
         <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.24em] text-base-500">
           // stack
         </p>
         <h2 className="text-3xl font-semibold text-white md:text-4xl">Tech Stack</h2>
       </div>
 
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-black to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-black to-transparent" />
-
-      <div className="group flex overflow-hidden">
-        <div className="flex animate-marquee group-hover:[animation-play-state:paused]">
+      <div className="group relative left-1/2 right-1/2 -mx-[50vw] w-screen overflow-hidden">
+        <div className="flex w-max animate-marquee items-center gap-8 py-6 group-hover:[animation-play-state:paused]">
           {looped.map((item, i) => (
             <TechCard key={`${item.name}-${i}`} item={item} />
           ))}
         </div>
       </div>
-    </section>
+    </>
   );
 }

@@ -1,18 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export function AboutPreview() {
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.5 }}
-      className="border-t border-base-800 px-4 py-16 sm:px-6 lg:px-8"
-    >
+    <div>
       <div className="mx-auto max-w-4xl">
         <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.24em] text-base-500">
           // about_preview
@@ -37,6 +30,6 @@ export function AboutPreview() {
           />
         </Link>
       </div>
-    </motion.section>
+    </div>
   );
 }

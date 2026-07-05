@@ -59,8 +59,7 @@ export function Hero() {
   }, []);
 
   return (
-    <section className="border-b border-base-800 px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="space-y-5">
+    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="space-y-5">
         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }} className="font-mono text-[11px] uppercase tracking-[0.3em] text-base-500">
           available for freelance & product roles
         </motion.p>
@@ -81,6 +80,9 @@ export function Hero() {
           <Button href="/projects" className="min-h-[44px]">
             view_projects()
           </Button>
+          <Button href="/contact" className="min-h-[44px]">
+            send_message()
+          </Button>
           <a
             href="/KENNETH_DARON_CADUCOY_RESUME.pdf"
             target="_blank"
@@ -90,11 +92,7 @@ export function Hero() {
           >
             resume ↓
           </a>
-          <Button href="/contact" className="min-h-[44px]">
-            send_message()
-          </Button>
         </motion.div>
       </motion.div>
-    </section>
   );
 }
